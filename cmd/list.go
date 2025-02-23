@@ -6,6 +6,8 @@ package cmd
 import (
 	"context"
 	"log"
+	"slices"
+	"strings"
 
 	"github.com/google/go-github/v69/github"
 	"github.com/spf13/cobra"
@@ -62,15 +64,15 @@ func init() {
 func filter(notifications []*github.Notification) []*github.Notification {
 	filtered := []*github.Notification{}
 	for _, notification := range notifications {
-		if repo != "" && *notification.Repository.Name != repo {
+		if repo != "" && !slices.Contains(strings.Split(repo, ","), *notification.Repository.Name) {
 			continue
 		}
 
-		if reason != "" && *notification.Reason != reason {
+		if reason != "" && !slices.Contains(strings.Split(reason, ","), *notification.Reason) {
 			continue
 		}
 
-		if owner != "" && *notification.Repository.Owner.Login != owner {
+		if owner != "" && !slices.Contains(strings.Split(owner, ","), *notification.Repository.Owner.Login) {
 			continue
 		}
 
@@ -78,7 +80,7 @@ func filter(notifications []*github.Notification) []*github.Notification {
 			continue
 		}
 
-		if notificationType != "" && *notification.Subject.Type != notificationType {
+		if notificationType != "" && !slices.Contains(strings.Split(notificationType, ","), *notification.Subject.Type) {
 			continue
 		}
 
