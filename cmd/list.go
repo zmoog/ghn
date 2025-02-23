@@ -16,6 +16,8 @@ import (
 var (
 	reason string
 	repo   string
+	owner  string
+	unseen bool
 )
 
 // listCmd represents the list command
@@ -54,18 +56,34 @@ func init() {
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	listCmd.Flags().StringVarP(&repo, "repo", "r", "", "Show notifications for a specific repository")
 	listCmd.Flags().StringVarP(&reason, "reason", "R", "", "Show notifications for a specific reason")
+	listCmd.Flags().StringVarP(&owner, "owner", "o", "", "Show notifications for a specific owner")
+	listCmd.Flags().BoolVarP(&unseen, "unseen", "u", false, "Show only unseen notifications")
 }
 
 func filter(notifications []*github.Notification) []*github.Notification {
-	if repo == "" && reason == "" {
-		return notifications
-	}
+	// if repo == "" && reason == "" {
+	// 	return notifications
+	// }
 
 	filtered := []*github.Notification{}
 	for _, notification := range notifications {
-		if *notification.Repository.Name == repo || *notification.Reason == reason {
-			filtered = append(filtered, notification)
+		if repo != "" && *notification.Repository.Name != repo {
+			continue
 		}
+
+		if reason != "" && *notification.Reason != reason {
+			continue
+		}
+
+		if owner != "" && *notification.Repository.Owner.Login != owner {
+			continue
+		}
+
+		if unseen && notification.LastReadAt != nil {
+			continue
+		}
+
+		filtered = append(filtered, notification)
 	}
 
 	return filtered

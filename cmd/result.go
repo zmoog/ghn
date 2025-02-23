@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/dustin/go-humanize"
 	"github.com/google/go-github/v69/github"
 	"github.com/pterm/pterm"
 )
@@ -21,29 +22,47 @@ func (r Result) String() string {
 }
 
 func (r Result) Table() string {
-
 	table := pterm.TableData{}
 	table = append(table, []string{
 		"Type",
-		"Repository",
+		"Owner",
+		"Repo",
 		"Reason",
+		"Updated",
+		"Last Read",
 		"URL",
 		"Title",
 	})
 
 	for _, notification := range r.Notifications {
+		lastReadAt := "-"
+
+		if notification.LastReadAt != nil {
+			lastReadAt = humanize.Time(notification.LastReadAt.Time)
+		}
+
 		table = append(table, []string{
 			*notification.Subject.Type,
+			*notification.Repository.Owner.Login,
 			*notification.Repository.Name,
 			*notification.Reason,
+			humanize.Time(notification.UpdatedAt.Time),
+			lastReadAt,
 			asLink(notification),
-			*notification.Subject.Title,
+			truncateString(*notification.Subject.Title, 50),
 		})
 	}
 
 	render, _ := pterm.DefaultTable.WithHasHeader().WithData(table).Srender()
 
 	return render
+}
+
+func truncateString(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen-3] + "..."
 }
 
 func asLink(notification *github.Notification) string {
