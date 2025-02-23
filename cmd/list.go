@@ -5,7 +5,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"log"
 
 	"github.com/google/go-github/v69/github"
@@ -14,10 +13,11 @@ import (
 )
 
 var (
-	reason string
-	repo   string
-	owner  string
-	unseen bool
+	reason           string
+	repo             string
+	owner            string
+	unseen           bool
+	notificationType string
 )
 
 // listCmd represents the list command
@@ -26,8 +26,6 @@ var listCmd = &cobra.Command{
 	Short: "List notifications",
 	Long:  `List notifications from GitHub.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("list called")
-
 		opts := &github.NotificationListOptions{}
 
 		notifications, _, err := client.Activity.ListNotifications(context.Background(), opts)
@@ -57,14 +55,11 @@ func init() {
 	listCmd.Flags().StringVarP(&repo, "repo", "r", "", "Show notifications for a specific repository")
 	listCmd.Flags().StringVarP(&reason, "reason", "R", "", "Show notifications for a specific reason")
 	listCmd.Flags().StringVarP(&owner, "owner", "o", "", "Show notifications for a specific owner")
+	listCmd.Flags().StringVarP(&notificationType, "type", "t", "", "Show notifications for a specific subject type")
 	listCmd.Flags().BoolVarP(&unseen, "unseen", "u", false, "Show only unseen notifications")
 }
 
 func filter(notifications []*github.Notification) []*github.Notification {
-	// if repo == "" && reason == "" {
-	// 	return notifications
-	// }
-
 	filtered := []*github.Notification{}
 	for _, notification := range notifications {
 		if repo != "" && *notification.Repository.Name != repo {
@@ -80,6 +75,10 @@ func filter(notifications []*github.Notification) []*github.Notification {
 		}
 
 		if unseen && notification.LastReadAt != nil {
+			continue
+		}
+
+		if notificationType != "" && *notification.Subject.Type != notificationType {
 			continue
 		}
 
