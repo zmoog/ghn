@@ -13,6 +13,11 @@ import (
 	"github.com/zmoog/ws/feedback"
 )
 
+var (
+	reason string
+	repo   string
+)
+
 // listCmd represents the list command
 var listCmd = &cobra.Command{
 	Use:   "list",
@@ -29,7 +34,7 @@ var listCmd = &cobra.Command{
 		}
 
 		feedback.PrintResult(Result{
-			Notifications: notifications,
+			Notifications: filter(notifications),
 		})
 
 	},
@@ -47,4 +52,21 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	listCmd.Flags().StringVarP(&repo, "repo", "r", "", "Show notifications for a specific repository")
+	listCmd.Flags().StringVarP(&reason, "reason", "R", "", "Show notifications for a specific reason")
+}
+
+func filter(notifications []*github.Notification) []*github.Notification {
+	if repo == "" && reason == "" {
+		return notifications
+	}
+
+	filtered := []*github.Notification{}
+	for _, notification := range notifications {
+		if *notification.Repository.Name == repo || *notification.Reason == reason {
+			filtered = append(filtered, notification)
+		}
+	}
+
+	return filtered
 }
