@@ -20,10 +20,10 @@ import (
 var (
 	includeAllRepos bool
 	state           string
-	assignee        string = "*"
+	assignee        string
 	creator         string
 	daysAgo         int
-	sort            string = "updated"
+	sort            string
 )
 
 // issuesCmd represents the issues command
