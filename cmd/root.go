@@ -15,9 +15,9 @@ var client *github.Client
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "ghn",
+	Use:   "ogh",
 	Short: "An opinionated GitHub Notifications CLI tool",
-	Long: `ghn is a CLI tool that helps you manage your GitHub notifications.
+	Long: `ogh is a CLI tool that helps you manage your GitHub notifications.
 
 It provides a simple way to view, filter, and manage your notifications from the command line.`,
 	// Uncomment the following line if your bare application
@@ -49,7 +49,7 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ghn.yaml)")
+	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.ogh.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
