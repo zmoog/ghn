@@ -4,35 +4,23 @@ Copyright © 2025 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
-	"fmt"
 	"os"
 
-	"github.com/google/go-github/v69/github"
 	"github.com/spf13/cobra"
+	"github.com/zmoog/ogh/cmd/issues"
+	"github.com/zmoog/ogh/cmd/notifications"
 )
-
-var client *github.Client
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "ogh",
-	Short: "An opinionated GitHub Notifications CLI tool",
-	Long: `ogh is a CLI tool that helps you manage your GitHub notifications.
+	Short: "Opinionated GitHub CLI tool",
+	Long: `ogh is a CLI tool that helps you manage your GitHub issues and notifications.
 
-It provides a simple way to view, filter, and manage your notifications from the command line.`,
+It provides a simple way to view, filter, and manage your issues and notifications from the command line.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
-	PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-		githubToken := os.Getenv("GITHUB_TOKEN")
-		if githubToken == "" {
-			return fmt.Errorf("GITHUB_TOKEN is not set")
-		}
-
-		client = github.NewClient(nil).WithAuthToken(githubToken)
-
-		return nil
-	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -45,6 +33,9 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.AddCommand(notifications.Cmd())
+	rootCmd.AddCommand(issues.Cmd())
+
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
