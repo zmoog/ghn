@@ -126,7 +126,7 @@ func init() {
 	// issuesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	listIssuesCmd.Flags().BoolVarP(&includeAllRepos, "all", "a", true, "Include issues from all repositories")
 
-	listByRepoCmd.Flags().StringVarP(&assignee, "assignee", "a", "", "Assignee of the issues")
+	listByRepoCmd.Flags().StringVarP(&assignee, "assignee", "a", "*", "Assignee of the issues")
 	listByRepoCmd.Flags().StringVarP(&creator, "creator", "c", "", "Creator of the issues")
 	listByRepoCmd.Flags().IntVarP(&daysAgo, "days-ago", "d", 30, "Days ago to search for issues")
 	listByRepoCmd.Flags().StringVarP(&state, "state", "s", "open", "State of the issues")
