@@ -29,8 +29,8 @@ var listByRepoCmd = &cobra.Command{
 		return nil
 	},
 	RunE: func(cmd *cobra.Command, args []string) error {
-		owner = args[0]
-		repo = args[1]
+		owner := args[0]
+		repo := args[1]
 
 		client, err := client.NewClient()
 		if err != nil {
@@ -59,6 +59,8 @@ var listByRepoCmd = &cobra.Command{
 		feedback.Println(fmt.Sprintf("Found %d issues", len(issues)))
 		feedback.PrintResult(IssueResult{
 			Issues: issues,
+			Owner:  owner,
+			Repo:   repo,
 		})
 
 		return nil
@@ -68,9 +70,9 @@ var listByRepoCmd = &cobra.Command{
 func init() {
 	listByRepoCmd.Flags().StringVarP(&assignee, "assignee", "a", "*", "Assignee of the issues")
 	listByRepoCmd.Flags().StringVarP(&creator, "creator", "c", "", "Creator of the issues")
-	listByRepoCmd.Flags().IntVarP(&daysAgo, "days-ago", "d", 30, "Days ago to search for issues")
 	listByRepoCmd.Flags().StringVarP(&state, "state", "s", "open", "State of the issues")
 	listByRepoCmd.Flags().StringVarP(&sort, "sort", "o", "updated", "Sort by (updated or created)")
+	listByRepoCmd.Flags().IntVarP(&daysAgo, "days-ago", "d", 30, "Days ago to search for issues")
 
 	// Add the list command to the issues command
 	issuesCmd.AddCommand(listByRepoCmd)

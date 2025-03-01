@@ -10,6 +10,8 @@ import (
 
 type IssueResult struct {
 	Issues []*github.Issue
+	Repo   string
+	Owner  string
 }
 
 func (r IssueResult) Data() any {
@@ -34,7 +36,7 @@ func (r IssueResult) Table() string {
 	for _, issue := range r.Issues {
 		table = append(table, []string{
 			*issue.Title,
-			fmt.Sprintf("https://github.com/%s/%s/issues/%d", owner, repo, *issue.Number),
+			r.asLink(issue),
 			*issue.State,
 			*issue.User.Login,
 			humanize.Time(issue.CreatedAt.Time),
@@ -45,4 +47,16 @@ func (r IssueResult) Table() string {
 	render, _ := pterm.DefaultTable.WithHasHeader().WithData(table).Srender()
 
 	return render
+}
+
+func (r IssueResult) asLink(issue *github.Issue) string {
+	if issue.Repository != nil {
+		return fmt.Sprintf("https://github.com/%s/%s/issues/%d", *issue.Repository.Owner.Login, *issue.Repository.Name, *issue.Number)
+	}
+
+	if r.Owner != "" && r.Repo != "" {
+		return fmt.Sprintf("https://github.com/%s/%s/issues/%d", r.Owner, r.Repo, *issue.Number)
+	}
+
+	return "-"
 }
