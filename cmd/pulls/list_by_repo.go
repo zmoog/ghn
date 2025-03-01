@@ -62,9 +62,8 @@ var listByRepoCmd = &cobra.Command{
 }
 
 func init() {
-	listByRepoCmd.Flags().StringVarP(&state, "state", "s", "open", "State of the issues")
-	listByRepoCmd.Flags().StringVarP(&sort, "sort", "o", "updated", "Sort by (updated or created)")
-
+	listByRepoCmd.Flags().StringVarP(&state, "state", "s", "open", "State of the pull requests")
+	listByRepoCmd.Flags().StringVarP(&sort, "sort", "o", "updated", "Sort by (updated, created, popularity, or long-running)")
 	// Add the list command to the pulls command
 	pullsCmd.AddCommand(listByRepoCmd)
 }
