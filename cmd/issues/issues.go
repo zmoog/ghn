@@ -9,13 +9,13 @@ import (
 
 var (
 	includeAllRepos bool
-	owner           string
-	repo            string
 	state           string
 	assignee        string
 	creator         string
 	daysAgo         int
 	sort            string
+	filter          string
+	labels          []string
 )
 
 // issuesCmd represents the issues command

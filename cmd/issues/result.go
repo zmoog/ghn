@@ -26,7 +26,7 @@ func (r IssueResult) Table() string {
 	table := pterm.TableData{}
 	table = append(table, []string{
 		"Title",
-		"Number",
+		"URL",
 		"State",
 		"User",
 		"Created",

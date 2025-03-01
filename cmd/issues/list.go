@@ -23,9 +23,11 @@ var listIssuesCmd = &cobra.Command{
 		}
 
 		opts := &github.IssueListOptions{
-			Sort:  "updated",
-			State: "open",
-			Since: time.Now().Add(-time.Hour * 24 * time.Duration(daysAgo)),
+			Sort:   sort,
+			State:  state,
+			Since:  time.Now().Add(-time.Hour * 24 * time.Duration(daysAgo)),
+			Filter: filter,
+			Labels: labels,
 			ListOptions: github.ListOptions{
 				PerPage: 100,
 			},
@@ -56,7 +58,11 @@ func init() {
 	// is called directly, e.g.:
 	// issuesCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	listIssuesCmd.Flags().BoolVarP(&includeAllRepos, "all", "a", true, "Include issues from all repositories")
-
+	listIssuesCmd.Flags().IntVarP(&daysAgo, "days-ago", "d", 30, "Days ago to search for issues")
+	listIssuesCmd.Flags().StringVarP(&sort, "sort", "o", "updated", "Sort by (updated or created)")
+	listIssuesCmd.Flags().StringVarP(&state, "state", "s", "open", "State of the issues")
+	listIssuesCmd.Flags().StringVarP(&filter, "filter", "f", "assigned", "Filter issues by (assignee, creator, mentioned, subscribed, all)")
+	listIssuesCmd.Flags().StringSliceVarP(&labels, "labels", "l", []string{}, "Labels to filter issues by")
 	// Add the list command to the issues command
 	issuesCmd.AddCommand(listIssuesCmd)
 }

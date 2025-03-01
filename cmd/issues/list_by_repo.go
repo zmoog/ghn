@@ -38,18 +38,19 @@ var listByRepoCmd = &cobra.Command{
 		}
 
 		opts := &github.IssueListByRepoOptions{
-			State: state,
-			Since: time.Now().Add(-time.Hour * 24 * time.Duration(daysAgo)),
-			Sort:  sort,
+			State:  state,
+			Since:  time.Now().Add(-time.Hour * 24 * time.Duration(daysAgo)),
+			Sort:   sort,
+			Labels: labels,
 		}
 
 		if creator != "" {
 			opts.Creator = creator
 		}
 
-		if assignee != "*" {
-			opts.Assignee = assignee
-		}
+		// if assignee != "*" {
+		// 	opts.Assignee = assignee
+		// }
 
 		issues, _, err := client.Issues.ListByRepo(context.Background(), owner, repo, opts)
 		if err != nil {
@@ -73,6 +74,7 @@ func init() {
 	listByRepoCmd.Flags().StringVarP(&state, "state", "s", "open", "State of the issues")
 	listByRepoCmd.Flags().StringVarP(&sort, "sort", "o", "updated", "Sort by (updated or created)")
 	listByRepoCmd.Flags().IntVarP(&daysAgo, "days-ago", "d", 30, "Days ago to search for issues")
+	listByRepoCmd.Flags().StringSliceVarP(&labels, "labels", "l", []string{}, "Labels to filter issues by")
 
 	// Add the list command to the issues command
 	issuesCmd.AddCommand(listByRepoCmd)
