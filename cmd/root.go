@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/zmoog/ogh/cmd/issues"
 	"github.com/zmoog/ogh/cmd/notifications"
+	"github.com/zmoog/ogh/cmd/pulls"
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -33,8 +34,9 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(notifications.Cmd())
 	rootCmd.AddCommand(issues.Cmd())
+	rootCmd.AddCommand(notifications.Cmd())
+	rootCmd.AddCommand(pulls.Cmd())
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
