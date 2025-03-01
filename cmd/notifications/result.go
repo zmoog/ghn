@@ -53,7 +53,10 @@ func (r Result) Table() string {
 		})
 	}
 
-	render, _ := pterm.DefaultTable.WithHasHeader().WithData(table).Srender()
+	render, err := pterm.DefaultTable.WithHasHeader().WithData(table).Srender()
+	if err != nil {
+		return fmt.Sprintf("Error rendering table: %s", err)
+	}
 
 	return render
 }
