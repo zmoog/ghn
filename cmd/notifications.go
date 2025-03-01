@@ -5,6 +5,7 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"slices"
 	"strings"
@@ -22,8 +23,23 @@ var (
 	notificationType string
 )
 
+// notificationsCmd represents the notifications command
+var notificationsCmd = &cobra.Command{
+	Use:   "notifications",
+	Short: "A brief description of your command",
+	Long: `A longer description that spans multiple lines and likely contains examples
+and usage of using your command. For example:
+
+Cobra is a CLI library for Go that empowers applications.
+This application is a tool to generate the needed files
+to quickly create a Cobra application.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("notification called")
+	},
+}
+
 // listCmd represents the list command
-var listCmd = &cobra.Command{
+var listNotificationsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List notifications",
 	Long:  `List notifications from GitHub.`,
@@ -43,7 +59,8 @@ var listCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(listCmd)
+	rootCmd.AddCommand(notificationsCmd)
+	notificationsCmd.AddCommand(listNotificationsCmd)
 
 	// Here you will define your flags and configuration settings.
 
@@ -54,11 +71,11 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	listCmd.Flags().StringVarP(&repo, "repo", "r", "", "Show notifications for a specific repository")
-	listCmd.Flags().StringVarP(&reason, "reason", "R", "", "Show notifications for a specific reason")
-	listCmd.Flags().StringVarP(&owner, "owner", "o", "", "Show notifications for a specific owner")
-	listCmd.Flags().StringVarP(&notificationType, "type", "t", "", "Show notifications for a specific subject type")
-	listCmd.Flags().BoolVarP(&unseen, "unseen", "u", false, "Show only unseen notifications")
+	listNotificationsCmd.Flags().StringVarP(&repo, "repo", "r", "", "Show notifications for a specific repository")
+	listNotificationsCmd.Flags().StringVarP(&reason, "reason", "R", "", "Show notifications for a specific reason")
+	listNotificationsCmd.Flags().StringVarP(&owner, "owner", "o", "", "Show notifications for a specific owner")
+	listNotificationsCmd.Flags().StringVarP(&notificationType, "type", "t", "", "Show notifications for a specific subject type")
+	listNotificationsCmd.Flags().BoolVarP(&unseen, "unseen", "u", false, "Show only unseen notifications")
 }
 
 func filter(notifications []*github.Notification) []*github.Notification {
