@@ -18,6 +18,14 @@ var listNotificationsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List notifications",
 	Long:  `List notifications from GitHub.`,
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		// avoid non-overlapping time ranges
+		if sinceDaysAgo > 0 && beforeDaysAgo > 0 && sinceDaysAgo <= beforeDaysAgo {
+			return fmt.Errorf("since-days-ago must be greater than before-days-ago")
+		}
+
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := client.NewClient()
 		if err != nil {
@@ -27,9 +35,12 @@ var listNotificationsCmd = &cobra.Command{
 		// https://docs.github.com/en/rest/activity/notifications?apiVersion=2022-11-28#list-notifications-for-the-authenticated-user
 		now := time.Now()
 		opts := &github.NotificationListOptions{
-			Since:         now.Add(-time.Hour * 24 * time.Duration(daysAgo)),
 			All:           all,
 			Participating: participating,
+		}
+
+		if sinceDaysAgo > 0 {
+			opts.Since = now.Add(-time.Hour * 24 * time.Duration(sinceDaysAgo))
 		}
 
 		if beforeDaysAgo > 0 {
@@ -106,7 +117,7 @@ func init() {
 	listNotificationsCmd.Flags().StringVarP(&notificationType, "type", "t", "", "Show notifications for a specific subject type")
 	listNotificationsCmd.Flags().BoolVarP(&unseen, "unseen", "u", false, "Show only unseen notifications")
 
-	listNotificationsCmd.Flags().IntVarP(&daysAgo, "days-ago", "d", 30, "Show notifications from the last n days")
+	listNotificationsCmd.Flags().IntVarP(&sinceDaysAgo, "since-days-ago", "s", 30, "Show notifications from the last n days")
 	listNotificationsCmd.Flags().IntVarP(&beforeDaysAgo, "before-days-ago", "b", 0, "Show notifications before the last n days")
 	listNotificationsCmd.Flags().BoolVarP(&participating, "participating", "p", false, "If true, only shows notifications in which the user is directly participating or mentioned.")
 	listNotificationsCmd.Flags().BoolVarP(&all, "all", "a", false, "If true, show notifications marked as read.")

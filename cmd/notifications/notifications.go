@@ -10,7 +10,7 @@ import (
 var (
 	all              bool
 	participating    bool
-	daysAgo          int
+	sinceDaysAgo     int
 	beforeDaysAgo    int
 	reason           string
 	repo             string
