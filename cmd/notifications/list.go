@@ -13,6 +13,10 @@ import (
 	"github.com/zmoog/ws/feedback"
 )
 
+const (
+	oneDay = time.Hour * 24
+)
+
 // listCmd represents the list command
 var listNotificationsCmd = &cobra.Command{
 	Use:   "list",
@@ -21,7 +25,11 @@ var listNotificationsCmd = &cobra.Command{
 	PreRunE: func(cmd *cobra.Command, args []string) error {
 		// avoid non-overlapping time ranges
 		if sinceDaysAgo > 0 && beforeDaysAgo > 0 && sinceDaysAgo <= beforeDaysAgo {
-			return fmt.Errorf("since-days-ago must be greater than before-days-ago")
+			return fmt.Errorf(
+				"since-days-ago (%d) must be greater than before-days-ago (%d) for overlapping time range",
+				sinceDaysAgo,
+				beforeDaysAgo,
+			)
 		}
 
 		return nil
@@ -40,11 +48,11 @@ var listNotificationsCmd = &cobra.Command{
 		}
 
 		if sinceDaysAgo > 0 {
-			opts.Since = now.Add(-time.Hour * 24 * time.Duration(sinceDaysAgo))
+			opts.Since = now.Add(-oneDay * time.Duration(sinceDaysAgo))
 		}
 
 		if beforeDaysAgo > 0 {
-			opts.Before = now.Add(-time.Hour * 24 * time.Duration(beforeDaysAgo))
+			opts.Before = now.Add(-oneDay * time.Duration(beforeDaysAgo))
 		}
 
 		notifications, _, err := client.Activity.ListNotifications(context.Background(), opts)
