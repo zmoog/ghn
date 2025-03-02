@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/google/go-github/v69/github"
 	"github.com/spf13/cobra"
@@ -12,26 +13,67 @@ import (
 	"github.com/zmoog/ws/feedback"
 )
 
+const (
+	oneDay = time.Hour * 24
+)
+
 // listCmd represents the list command
 var listNotificationsCmd = &cobra.Command{
 	Use:   "list",
 	Short: "List notifications",
 	Long:  `List notifications from GitHub.`,
+	PreRunE: func(cmd *cobra.Command, args []string) error {
+		// avoid non-overlapping time ranges
+		if sinceDaysAgo > 0 && beforeDaysAgo > 0 && sinceDaysAgo <= beforeDaysAgo {
+			return fmt.Errorf(
+				"since-days-ago (%d) must be greater than before-days-ago (%d) for overlapping time range",
+				sinceDaysAgo,
+				beforeDaysAgo,
+			)
+		}
+
+		return nil
+	},
 	RunE: func(cmd *cobra.Command, args []string) error {
 		client, err := client.NewClient()
 		if err != nil {
 			return fmt.Errorf("failed to create GitHub client: %w", err)
 		}
 
-		opts := &github.NotificationListOptions{}
+		// https://docs.github.com/en/rest/activity/notifications?apiVersion=2022-11-28#list-notifications-for-the-authenticated-user
+		now := time.Now()
+		opts := &github.NotificationListOptions{
+			All:           all,
+			Participating: participating,
+		}
+
+		if sinceDaysAgo > 0 {
+			opts.Since = now.Add(-oneDay * time.Duration(sinceDaysAgo))
+		}
+
+		if beforeDaysAgo > 0 {
+			opts.Before = now.Add(-oneDay * time.Duration(beforeDaysAgo))
+		}
 
 		notifications, _, err := client.Activity.ListNotifications(context.Background(), opts)
 		if err != nil {
 			return fmt.Errorf("failed to list notifications: %w", err)
 		}
 
+		// Filter out notifications that don't match
+		// criteria not available in the API
+		filtered := filter(notifications)
+
+		// highlight the number of notifications
+		// filtered out and print the result
+		feedback.Println(
+			fmt.Sprintf("Found %d notifications (%d filtered out)",
+				len(notifications),
+				len(notifications)-len(filtered),
+			),
+		)
 		feedback.PrintResult(Result{
-			Notifications: filter(notifications),
+			Notifications: filtered,
 		})
 
 		return nil
@@ -82,6 +124,11 @@ func init() {
 	listNotificationsCmd.Flags().StringVarP(&owner, "owner", "o", "", "Show notifications for a specific owner")
 	listNotificationsCmd.Flags().StringVarP(&notificationType, "type", "t", "", "Show notifications for a specific subject type")
 	listNotificationsCmd.Flags().BoolVarP(&unseen, "unseen", "u", false, "Show only unseen notifications")
+
+	listNotificationsCmd.Flags().IntVarP(&sinceDaysAgo, "since-days-ago", "s", 30, "Show notifications from the last n days")
+	listNotificationsCmd.Flags().IntVarP(&beforeDaysAgo, "before-days-ago", "b", 0, "Show notifications before the last n days")
+	listNotificationsCmd.Flags().BoolVarP(&participating, "participating", "p", false, "If true, only shows notifications in which the user is directly participating or mentioned.")
+	listNotificationsCmd.Flags().BoolVarP(&all, "all", "a", false, "If true, show notifications marked as read.")
 
 	// Add the list command to the notifications command
 	notificationsCmd.AddCommand(listNotificationsCmd)

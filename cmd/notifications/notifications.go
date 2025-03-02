@@ -8,6 +8,10 @@ import (
 )
 
 var (
+	all              bool
+	participating    bool
+	sinceDaysAgo     int
+	beforeDaysAgo    int
 	reason           string
 	repo             string
 	owner            string
