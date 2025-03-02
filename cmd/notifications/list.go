@@ -28,9 +28,12 @@ var listNotificationsCmd = &cobra.Command{
 		now := time.Now()
 		opts := &github.NotificationListOptions{
 			Since:         now.Add(-time.Hour * 24 * time.Duration(daysAgo)),
-			Before:        now.Add(-time.Hour * 24 * time.Duration(beforeDaysAgo)),
 			All:           all,
 			Participating: participating,
+		}
+
+		if beforeDaysAgo > 0 {
+			opts.Before = now.Add(-time.Hour * 24 * time.Duration(beforeDaysAgo))
 		}
 
 		notifications, _, err := client.Activity.ListNotifications(context.Background(), opts)
