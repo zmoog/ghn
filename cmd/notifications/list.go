@@ -25,9 +25,10 @@ var listNotificationsCmd = &cobra.Command{
 		}
 
 		// https://docs.github.com/en/rest/activity/notifications?apiVersion=2022-11-28#list-notifications-for-the-authenticated-user
+		now := time.Now()
 		opts := &github.NotificationListOptions{
-			Since:         time.Now().Add(-time.Hour * 24 * time.Duration(daysAgo)),
-			Before:        time.Now().Add(-time.Hour * 24 * time.Duration(beforeDaysAgo)),
+			Since:         now.Add(-time.Hour * 24 * time.Duration(daysAgo)),
+			Before:        now.Add(-time.Hour * 24 * time.Duration(beforeDaysAgo)),
 			All:           all,
 			Participating: participating,
 		}
@@ -104,7 +105,6 @@ func init() {
 
 	listNotificationsCmd.Flags().IntVarP(&daysAgo, "days-ago", "d", 30, "Show notifications from the last n days")
 	listNotificationsCmd.Flags().IntVarP(&beforeDaysAgo, "before-days-ago", "b", 0, "Show notifications before the last n days")
-	// listNotificationsCmd.Flags().IntVarP(&perPage, "per-page", "p", 100, "Number of notifications to show per page")
 	listNotificationsCmd.Flags().BoolVarP(&participating, "participating", "p", false, "If true, only shows notifications in which the user is directly participating or mentioned.")
 	listNotificationsCmd.Flags().BoolVarP(&all, "all", "a", false, "If true, show notifications marked as read.")
 

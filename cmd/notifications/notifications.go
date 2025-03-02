@@ -12,7 +12,6 @@ var (
 	participating    bool
 	daysAgo          int
 	beforeDaysAgo    int
-	perPage          int
 	reason           string
 	repo             string
 	owner            string
