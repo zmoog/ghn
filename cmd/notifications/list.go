@@ -87,6 +87,10 @@ func filter(notifications []*github.Notification) []*github.Notification {
 			continue
 		}
 
+		if excludeRepo != "" && slices.Contains(strings.Split(excludeRepo, ","), *notification.Repository.Name) {
+			continue
+		}
+
 		if reason != "" && !slices.Contains(strings.Split(reason, ","), *notification.Reason) {
 			continue
 		}
@@ -120,6 +124,7 @@ func init() {
 	// is called directly, e.g.:
 	// listCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 	listNotificationsCmd.Flags().StringVarP(&repo, "repo", "r", "", "Show notifications for a specific repository")
+	listNotificationsCmd.Flags().StringVarP(&excludeRepo, "exclude-repo", "x", "", "Show notifications for all repositories except the specified ones")
 	listNotificationsCmd.Flags().StringVarP(&reason, "reason", "R", "", "Show notifications for a specific reason")
 	listNotificationsCmd.Flags().StringVarP(&owner, "owner", "o", "", "Show notifications for a specific owner")
 	listNotificationsCmd.Flags().StringVarP(&notificationType, "type", "t", "", "Show notifications for a specific subject type")
