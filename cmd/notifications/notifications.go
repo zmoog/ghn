@@ -14,6 +14,7 @@ var (
 	beforeDaysAgo    int
 	reason           string
 	repo             string
+	excludeRepo      string
 	owner            string
 	unseen           bool
 	notificationType string
